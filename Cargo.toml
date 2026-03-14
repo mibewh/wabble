@@ -1,0 +1,10 @@
+[workspace]
+resolver = "2"
+members = [
+    "crates/wabble-platform",
+    "crates/wabble-words",
+]
+
+[workspace.package]
+edition = "2024"
+license = "MIT"
