@@ -34,8 +34,8 @@ fn cursor_world_pos(
     windows: &Query<&Window>,
     cameras: &Query<(&Camera, &GlobalTransform)>,
 ) -> Option<Vec2> {
-    let window = windows.single();
-    let (camera, camera_transform) = cameras.single();
+    let window = windows.single().ok()?;
+    let (camera, camera_transform) = cameras.single().ok()?;
     let cursor_pos = window.cursor_position()?;
     camera
         .viewport_to_world_2d(camera_transform, cursor_pos)
@@ -150,7 +150,7 @@ pub fn update_drag_ghost(
     if !is_dragging {
         // Remove ghost if drag ended
         for entity in &existing {
-            commands.entity(entity).despawn_recursive();
+            commands.entity(entity).despawn();
         }
         return;
     }
@@ -160,7 +160,7 @@ pub fn update_drag_ghost(
 
     // Remove old ghost and respawn at new position
     for entity in &existing {
-        commands.entity(entity).despawn_recursive();
+        commands.entity(entity).despawn();
     }
 
     let letter = info.tile.letter().unwrap_or(' ');
@@ -377,10 +377,10 @@ pub fn handle_turn_transition(
                             height: Val::Px(60.0),
                             align_items: AlignItems::Center,
                             justify_content: JustifyContent::Center,
+                            border_radius: BorderRadius::all(Val::Px(8.0)),
                             ..default()
                         },
                         BackgroundColor(Color::srgb(0.2, 0.6, 0.3)),
-                        BorderRadius::all(Val::Px(8.0)),
                     ))
                     .with_children(|btn| {
                         btn.spawn((
@@ -402,7 +402,7 @@ pub fn handle_turn_transition(
                 transition.active = false;
             }
             for entity in &overlay_query {
-                commands.entity(entity).despawn_recursive();
+                commands.entity(entity).despawn();
             }
 
             // Check if game is over

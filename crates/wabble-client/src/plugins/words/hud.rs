@@ -113,7 +113,7 @@ pub fn spawn_hud(mut commands: Commands) {
         });
 }
 
-fn spawn_action_button(parent: &mut ChildBuilder, label: &str, marker: impl Component) {
+fn spawn_action_button(parent: &mut ChildSpawnerCommands, label: &str, marker: impl Component) {
     parent
         .spawn((
             marker,
@@ -123,10 +123,10 @@ fn spawn_action_button(parent: &mut ChildBuilder, label: &str, marker: impl Comp
                 height: Val::Px(40.0),
                 align_items: AlignItems::Center,
                 justify_content: JustifyContent::Center,
+                border_radius: BorderRadius::all(Val::Px(6.0)),
                 ..default()
             },
             BackgroundColor(Color::srgb(0.25, 0.25, 0.3)),
-            BorderRadius::all(Val::Px(6.0)),
         ))
         .with_children(|btn| {
             btn.spawn((
@@ -210,6 +210,6 @@ pub fn update_button_colors(
 
 pub fn cleanup_hud(mut commands: Commands, query: Query<Entity, With<HudRoot>>) {
     for entity in &query {
-        commands.entity(entity).despawn_recursive();
+        commands.entity(entity).despawn();
     }
 }

@@ -67,14 +67,14 @@ pub fn update_rack_display(
     if let Some(ref t) = transition
         && t.active {
             for entity in &existing {
-                commands.entity(entity).despawn_recursive();
+                commands.entity(entity).despawn();
             }
             return;
         }
 
     // Remove old rack sprites
     for entity in &existing {
-        commands.entity(entity).despawn_recursive();
+        commands.entity(entity).despawn();
     }
 
     let current_player = active_match.game.state().current_player_idx;
@@ -154,9 +154,9 @@ pub fn update_rack_display(
 
 pub fn cleanup_rack(mut commands: Commands, query: Query<Entity, With<RackRoot>>, tiles: Query<Entity, With<RackTileSprite>>) {
     for entity in &query {
-        commands.entity(entity).despawn_recursive();
+        commands.entity(entity).despawn();
     }
     for entity in &tiles {
-        commands.entity(entity).despawn_recursive();
+        commands.entity(entity).despawn();
     }
 }

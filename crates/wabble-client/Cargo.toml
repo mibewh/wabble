@@ -9,7 +9,7 @@ wabble-platform = { path = "../wabble-platform" }
 wabble-words = { path = "../wabble-words" }
 wabble-dict = { path = "../wabble-dict" }
 wabble-ai = { path = "../wabble-ai" }
-bevy = "0.15"
+bevy = "0.18"
 
 [features]
 dev = ["bevy/dynamic_linking"]

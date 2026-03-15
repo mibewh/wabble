@@ -108,7 +108,7 @@ fn setup_menu(mut commands: Commands) {
         });
 }
 
-fn spawn_menu_button(parent: &mut ChildBuilder, label: &str, button: MenuButton) {
+fn spawn_menu_button(parent: &mut ChildSpawnerCommands, label: &str, button: MenuButton) {
     parent
         .spawn((
             button,
@@ -118,10 +118,10 @@ fn spawn_menu_button(parent: &mut ChildBuilder, label: &str, button: MenuButton)
                 height: Val::Px(50.0),
                 align_items: AlignItems::Center,
                 justify_content: JustifyContent::Center,
+                border_radius: BorderRadius::all(Val::Px(8.0)),
                 ..default()
             },
             BackgroundColor(Color::srgb(0.25, 0.25, 0.3)),
-            BorderRadius::all(Val::Px(8.0)),
         ))
         .with_children(|btn| {
             btn.spawn((
@@ -222,6 +222,6 @@ fn menu_button_system(
 
 fn cleanup_menu(mut commands: Commands, query: Query<Entity, With<MenuRoot>>) {
     for entity in &query {
-        commands.entity(entity).despawn_recursive();
+        commands.entity(entity).despawn();
     }
 }

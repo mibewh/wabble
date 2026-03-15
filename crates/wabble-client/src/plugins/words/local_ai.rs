@@ -44,7 +44,7 @@ pub fn ai_turn_system(
     match ai_timer {
         Some(ref mut timer) => {
             timer.timer.tick(time.delta());
-            if !timer.timer.finished() {
+            if !timer.timer.is_finished() {
                 return;
             }
             commands.remove_resource::<AiMoveTimer>();

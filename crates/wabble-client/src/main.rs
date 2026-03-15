@@ -20,7 +20,7 @@ fn main() {
             DefaultPlugins.set(WindowPlugin {
                 primary_window: Some(Window {
                     title: "Wabble".to_string(),
-                    resolution: bevy::window::WindowResolution::new(1100.0, 750.0),
+                    resolution: bevy::window::WindowResolution::new(1100, 750),
                     ..default()
                 }),
                 ..default()
@@ -119,10 +119,10 @@ fn setup_game_over(mut commands: Commands, active_match: Option<Res<resources::A
                         height: Val::Px(50.0),
                         align_items: AlignItems::Center,
                         justify_content: JustifyContent::Center,
+                        border_radius: BorderRadius::all(Val::Px(8.0)),
                         ..default()
                     },
                     BackgroundColor(Color::srgb(0.25, 0.25, 0.3)),
-                    BorderRadius::all(Val::Px(8.0)),
                 ))
                 .with_children(|btn| {
                     btn.spawn((
@@ -159,6 +159,6 @@ fn game_over_button(
 
 fn cleanup_game_over(mut commands: Commands, query: Query<Entity, With<GameOverRoot>>) {
     for entity in &query {
-        commands.entity(entity).despawn_recursive();
+        commands.entity(entity).despawn();
     }
 }

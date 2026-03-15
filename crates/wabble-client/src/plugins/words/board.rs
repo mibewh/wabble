@@ -143,10 +143,10 @@ pub fn update_board_display(
 
     // Remove old tile sprites
     for entity in &existing_tiles {
-        commands.entity(entity).despawn_recursive();
+        commands.entity(entity).despawn();
     }
     for entity in &existing_pending {
-        commands.entity(entity).despawn_recursive();
+        commands.entity(entity).despawn();
     }
 
     let board = &active_match.game.state().board;
@@ -232,12 +232,12 @@ pub fn cleanup_board(
     pending_sprites: Query<Entity, With<PendingTileSprite>>,
 ) {
     for entity in &board_root {
-        commands.entity(entity).despawn_recursive();
+        commands.entity(entity).despawn();
     }
     for entity in &tile_sprites {
-        commands.entity(entity).despawn_recursive();
+        commands.entity(entity).despawn();
     }
     for entity in &pending_sprites {
-        commands.entity(entity).despawn_recursive();
+        commands.entity(entity).despawn();
     }
 }
