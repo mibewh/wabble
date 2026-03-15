@@ -75,3 +75,16 @@ pub struct GameDictionary {
 pub struct StatusMessage {
     pub text: String,
 }
+
+/// Marks that this game has an AI opponent and which player index it controls.
+#[derive(Resource)]
+pub struct AiOpponent {
+    pub player_idx: usize,
+    pub ai: std::sync::Arc<wabble_ai::WordGameAi>,
+}
+
+/// Timer to add a small delay before AI moves, so the player can see what happened.
+#[derive(Resource)]
+pub struct AiMoveTimer {
+    pub timer: bevy::time::Timer,
+}

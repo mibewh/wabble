@@ -149,6 +149,8 @@ fn game_over_button(
             commands.remove_resource::<resources::SelectedRackTile>();
             commands.remove_resource::<resources::TurnTransition>();
             commands.remove_resource::<resources::StatusMessage>();
+            commands.remove_resource::<resources::AiOpponent>();
+            commands.remove_resource::<resources::AiMoveTimer>();
             next_state.set(AppState::MainMenu);
         }
     }

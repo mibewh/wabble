@@ -4,6 +4,7 @@ members = [
     "crates/wabble-platform",
     "crates/wabble-words",
     "crates/wabble-dict",
+    "crates/wabble-ai",
     "crates/wabble-client",
     "tools/dict-builder",
 ]

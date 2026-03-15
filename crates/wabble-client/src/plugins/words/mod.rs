@@ -1,6 +1,7 @@
 pub mod board;
 pub mod hud;
 pub mod input;
+pub mod local_ai;
 pub mod rack;
 
 use bevy::prelude::*;
@@ -29,6 +30,7 @@ impl Plugin for WordsGamePlugin {
                 hud::update_score_display,
                 hud::update_status_display,
                 hud::update_button_colors,
+                local_ai::ai_turn_system,
             )
                 .run_if(in_state(AppState::InGame)),
         )

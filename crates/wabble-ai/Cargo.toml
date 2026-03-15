@@ -1,5 +1,5 @@
 [package]
-name = "wabble-client"
+name = "wabble-ai"
 version = "0.1.0"
 edition.workspace = true
 license.workspace = true
@@ -8,9 +8,4 @@ license.workspace = true
 wabble-platform = { path = "../wabble-platform" }
 wabble-words = { path = "../wabble-words" }
 wabble-dict = { path = "../wabble-dict" }
-wabble-ai = { path = "../wabble-ai" }
-bevy = "0.15"
-
-[features]
-dev = ["bevy/dynamic_linking"]
-desktop = []
+rand = "0.8"
