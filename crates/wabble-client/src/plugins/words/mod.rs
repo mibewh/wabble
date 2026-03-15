@@ -19,8 +19,8 @@ impl Plugin for WordsGamePlugin {
         .add_systems(
             Update,
             (
-                input::handle_board_click,
-                input::handle_rack_click,
+                input::handle_drag,
+                input::update_drag_ghost,
                 input::handle_play_button,
                 input::handle_pass_button,
                 input::handle_recall_button,

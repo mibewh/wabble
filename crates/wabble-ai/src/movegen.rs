@@ -282,10 +282,11 @@ fn gen_moves_at_anchor(
             );
         }
     } else {
-        // No existing prefix. We can place tiles to the left/up of the anchor.
-        // Determine max left/up extension (up to the next anchor or board edge).
+        // No existing prefix. We place tiles starting at the anchor and optionally
+        // extending left. max_left = 1 (anchor only) + available empty squares to the left.
         let anchor_pos = if horizontal { col } else { row };
-        let mut max_left = 0;
+        // Count available squares to the left of the anchor
+        let mut left_avail = 0;
         let mut p = anchor_pos;
         while p > 0 {
             p -= 1;
@@ -309,10 +310,11 @@ fn gen_moves_at_anchor(
             if is_anchor && (r, c) != (anchor_row, anchor_col) {
                 break;
             }
-            max_left += 1;
+            left_avail += 1;
         }
+        // left_count=0 is the anchor itself, so max_left = 1 + left_avail
+        let max_left = 1 + left_avail;
 
-        // Start with just the anchor (no left extension)
         let root = gaddag.root();
         gen_left(
             board,
@@ -353,8 +355,10 @@ fn gen_left(
     prefix_letters: &mut Vec<char>,
     moves: &mut Vec<CandidateMove>,
 ) {
-    // Try to cross the separator and extend right from the anchor
+    // Try to cross the separator and extend right from anchor+1
+    // (the anchor position itself is occupied by the first tile placed in gen_left)
     if let Some(sep_node) = node.follow(SEPARATOR) {
+        let right_start = anchor_pos + 1;
         extend_right(
             board,
             cross_checks,
@@ -364,7 +368,7 @@ fn gen_left(
             anchor_row,
             anchor_col,
             horizontal,
-            anchor_pos,
+            right_start,
             placed,
             prefix_letters,
             moves,
@@ -375,8 +379,10 @@ fn gen_left(
         return;
     }
 
-    // Try each letter from the rack for the position to the left
-    let left_pos = anchor_pos - left_count - 1;
+    // Try each letter from the rack at this position.
+    // left_count=0 places at anchor_pos (the anchor letter in GADDAG terms),
+    // left_count=1 places at anchor_pos-1, etc.
+    let left_pos = anchor_pos - left_count;
     let (r, c) = if horizontal {
         (anchor_row, left_pos)
     } else {

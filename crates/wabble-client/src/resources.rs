@@ -55,6 +55,20 @@ pub struct SelectedRackTile {
     pub index: Option<usize>,
 }
 
+/// State for drag-and-drop of rack tiles.
+#[derive(Resource, Default)]
+pub struct DragState {
+    /// The rack index being dragged, if any.
+    pub dragging: Option<DragInfo>,
+}
+
+pub struct DragInfo {
+    pub rack_index: usize,
+    pub tile: Tile,
+    /// Current world-space position of the drag ghost.
+    pub world_pos: Vec2,
+}
+
 /// Turn transition state - shown between hot-seat turns.
 #[derive(Resource)]
 #[derive(Default)]

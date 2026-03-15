@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 use wabble_platform::TurnBasedGame;
 
-use crate::resources::{ActiveMatch, PendingPlacement, SelectedRackTile, TurnTransition};
+use crate::resources::{ActiveMatch, DragState, PendingPlacement, SelectedRackTile, TurnTransition};
 
 pub const RACK_Y: f32 = -280.0;
 pub const RACK_TILE_SIZE: f32 = 40.0;
@@ -38,11 +38,13 @@ pub fn spawn_rack(mut commands: Commands) {
     commands.spawn((RackRoot, Transform::default(), Visibility::default()));
 }
 
+#[allow(clippy::too_many_arguments)]
 pub fn update_rack_display(
     mut commands: Commands,
     active_match: Option<Res<ActiveMatch>>,
     selected: Option<Res<SelectedRackTile>>,
     pending: Option<Res<PendingPlacement>>,
+    drag_state: Option<Res<DragState>>,
     transition: Option<Res<TurnTransition>>,
     existing: Query<Entity, With<RackTileSprite>>,
 ) {
@@ -54,9 +56,10 @@ pub fn update_rack_display(
     let match_changed = active_match.is_changed();
     let selected_changed = selected.as_ref().is_some_and(|s| s.is_changed());
     let pending_changed = pending.as_ref().is_some_and(|p| p.is_changed());
+    let drag_changed = drag_state.as_ref().is_some_and(|d| d.is_changed());
     let transition_changed = transition.as_ref().is_some_and(|t| t.is_changed());
 
-    if !match_changed && !selected_changed && !pending_changed && !transition_changed {
+    if !match_changed && !selected_changed && !pending_changed && !drag_changed && !transition_changed {
         return;
     }
 
@@ -87,6 +90,9 @@ pub fn update_rack_display(
         .unwrap_or_default();
 
     let selected_idx = selected.as_ref().and_then(|s| s.index);
+    let dragging_idx = drag_state
+        .as_ref()
+        .and_then(|d| d.dragging.as_ref().map(|info| info.rack_index));
     let rack = &player_state.rack;
     let total_visible = rack.len();
 
@@ -97,8 +103,11 @@ pub fn update_rack_display(
 
         let pos = rack_slot_pos(i, total_visible);
         let is_selected = selected_idx == Some(i);
+        let is_dragging = dragging_idx == Some(i);
 
-        let bg_color = if is_selected {
+        let bg_color = if is_dragging {
+            Color::srgba(0.85, 0.78, 0.6, 0.3) // ghost/dimmed while dragging
+        } else if is_selected {
             Color::srgb(0.7, 0.85, 0.7) // green highlight
         } else {
             Color::srgb(0.95, 0.88, 0.7)

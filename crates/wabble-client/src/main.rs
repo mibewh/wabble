@@ -147,6 +147,7 @@ fn game_over_button(
             commands.remove_resource::<resources::ActiveMatch>();
             commands.remove_resource::<resources::PendingPlacement>();
             commands.remove_resource::<resources::SelectedRackTile>();
+            commands.remove_resource::<resources::DragState>();
             commands.remove_resource::<resources::TurnTransition>();
             commands.remove_resource::<resources::StatusMessage>();
             commands.remove_resource::<resources::AiOpponent>();

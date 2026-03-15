@@ -1,5 +1,6 @@
 use bevy::prelude::*;
 use wabble_platform::{GameAi, TurnBasedGame};
+use wabble_words::game::WordAction;
 
 use crate::app_states::AppState;
 use crate::resources::{ActiveMatch, AiMoveTimer, AiOpponent, StatusMessage, TurnTransition};
@@ -62,22 +63,29 @@ pub fn ai_turn_system(
 
     // AI makes its move
     let ai = &ai_opponent.ai;
-    if let Some(action) = ai.choose_action(&active_match.game, current) {
-        match active_match.game.apply_action(current, action) {
-            Ok(result) => {
-                if let Some(ref mut status) = status {
-                    status.text = format!("AI {}", result.turn_summary);
-                }
+    let action = ai
+        .choose_action(&active_match.game, current)
+        .unwrap_or(WordAction::Pass);
 
-                if active_match.game.is_finished() {
-                    next_state.set(AppState::GameOver);
-                }
-                // No turn transition needed for AI games - human goes next
+    match active_match.game.apply_action(current, action) {
+        Ok(result) => {
+            if let Some(ref mut status) = status {
+                status.text = format!("AI {}", result.turn_summary);
             }
-            Err(e) => {
-                if let Some(ref mut status) = status {
-                    status.text = format!("AI error: {e}");
-                }
+
+            if active_match.game.is_finished() {
+                next_state.set(AppState::GameOver);
+            }
+        }
+        Err(e) => {
+            // If the AI's move was rejected, fall back to passing
+            warn!("AI move rejected ({e}), falling back to pass");
+            let _ = active_match.game.apply_action(current, WordAction::Pass);
+            if let Some(ref mut status) = status {
+                status.text = "AI passed".to_string();
+            }
+            if active_match.game.is_finished() {
+                next_state.set(AppState::GameOver);
             }
         }
     }

@@ -6,7 +6,8 @@ use wabble_words::game::{WordGame, WordGameConfig};
 
 use crate::app_states::AppState;
 use crate::resources::{
-    ActiveMatch, AiOpponent, PendingPlacement, SelectedRackTile, StatusMessage, TurnTransition,
+    ActiveMatch, AiOpponent, DragState, PendingPlacement, SelectedRackTile, StatusMessage,
+    TurnTransition,
 };
 
 pub struct LobbyPlugin;
@@ -178,6 +179,7 @@ fn menu_button_system(
                 });
                 commands.insert_resource(PendingPlacement::default());
                 commands.insert_resource(SelectedRackTile::default());
+                commands.insert_resource(DragState::default());
                 commands.insert_resource(TurnTransition::default());
                 commands.insert_resource(StatusMessage::default());
                 next_state.set(AppState::InGame);
@@ -209,6 +211,7 @@ fn menu_button_system(
                 });
                 commands.insert_resource(PendingPlacement::default());
                 commands.insert_resource(SelectedRackTile::default());
+                commands.insert_resource(DragState::default());
                 commands.insert_resource(TurnTransition::default());
                 commands.insert_resource(StatusMessage::default());
                 next_state.set(AppState::InGame);
