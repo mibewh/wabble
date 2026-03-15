@@ -3,8 +3,18 @@ resolver = "2"
 members = [
     "crates/wabble-platform",
     "crates/wabble-words",
+    "crates/wabble-dict",
+    "crates/wabble-client",
+    "tools/dict-builder",
 ]
 
 [workspace.package]
 edition = "2024"
 license = "MIT"
+
+# Optimize deps in dev for playable framerates, keep own code fast to compile
+[profile.dev]
+opt-level = 1
+
+[profile.dev.package."*"]
+opt-level = 3
