@@ -2,7 +2,7 @@
 
 A cross-platform turn-based game platform built with Rust. The first game is a Scrabble-style word game with local multiplayer and AI opponents. Online multiplayer, web, and mobile builds are on the roadmap.
 
-![Rust](https://img.shields.io/badge/Rust-2024_edition-orange)
+![Rust](https://img.shields.io/badge/Rust-2026_edition-orange)
 ![Bevy](https://img.shields.io/badge/Bevy-0.18-blue)
 ![License](https://img.shields.io/badge/License-MIT-green)
 
