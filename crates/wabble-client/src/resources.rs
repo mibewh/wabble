@@ -84,6 +84,16 @@ pub struct GameDictionary {
     pub dict: wabble_dict::FstDictionary,
 }
 
+/// Preview of words and score for the current pending placement.
+#[derive(Resource, Default)]
+pub struct ScorePreview {
+    /// Each entry is (word_string, word_score).
+    pub words: Vec<(String, i32)>,
+    pub total_score: i32,
+    /// Whether the current placement is valid.
+    pub valid: bool,
+}
+
 /// Last action result message to display.
 #[derive(Resource, Default)]
 pub struct StatusMessage {

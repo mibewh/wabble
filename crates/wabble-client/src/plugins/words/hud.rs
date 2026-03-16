@@ -1,7 +1,10 @@
 use bevy::prelude::*;
 use wabble_platform::TurnBasedGame;
 
-use crate::resources::{ActiveMatch, StatusMessage};
+use wabble_words::placement::validate_placement;
+use wabble_words::scoring;
+
+use crate::resources::{ActiveMatch, PendingPlacement, ScorePreview, StatusMessage};
 
 use super::input::{PassButton, PlayButton, RecallButton};
 
@@ -19,6 +22,12 @@ pub struct CurrentPlayerText;
 
 #[derive(Component)]
 pub struct TilesRemainingText;
+
+#[derive(Component)]
+pub struct ScorePreviewPanel;
+
+#[derive(Component)]
+pub struct ScorePreviewText;
 
 pub fn spawn_hud(mut commands: Commands) {
     commands
@@ -89,6 +98,35 @@ pub fn spawn_hud(mut commands: Commands) {
                     spawn_action_button(panel, "Play", PlayButton);
                     spawn_action_button(panel, "Pass", PassButton);
                     spawn_action_button(panel, "Recall", RecallButton);
+                });
+
+            // Score preview (left side)
+            parent
+                .spawn((
+                    ScorePreviewPanel,
+                    Node {
+                        position_type: PositionType::Absolute,
+                        left: Val::Px(20.0),
+                        top: Val::Px(20.0),
+                        flex_direction: FlexDirection::Column,
+                        row_gap: Val::Px(4.0),
+                        padding: UiRect::all(Val::Px(12.0)),
+                        border_radius: BorderRadius::all(Val::Px(6.0)),
+                        display: Display::None,
+                        ..default()
+                    },
+                    BackgroundColor(Color::srgba(0.1, 0.1, 0.15, 0.85)),
+                ))
+                .with_children(|panel| {
+                    panel.spawn((
+                        ScorePreviewText,
+                        Text::new(""),
+                        TextFont {
+                            font_size: 16.0,
+                            ..default()
+                        },
+                        TextColor(Color::srgb(0.9, 0.95, 0.8)),
+                    ));
                 });
 
             // Status message (bottom center)
@@ -191,6 +229,97 @@ pub fn update_status_display(
     }
     for mut text in &mut query {
         **text = status.text.clone();
+    }
+}
+
+pub fn update_score_preview(
+    active_match: Option<Res<ActiveMatch>>,
+    pending: Option<Res<PendingPlacement>>,
+    mut preview: ResMut<ScorePreview>,
+) {
+    let Some(pending) = pending else {
+        *preview = ScorePreview::default();
+        return;
+    };
+    if !pending.is_changed() {
+        return;
+    }
+
+    let Some(active_match) = active_match else {
+        *preview = ScorePreview::default();
+        return;
+    };
+
+    if pending.tiles.is_empty() {
+        *preview = ScorePreview::default();
+        return;
+    }
+
+    let state = active_match.game.state();
+    let placed = pending.to_placed_tiles();
+    let is_first_move = state.board.is_empty();
+
+    match validate_placement(&state.board, &placed, is_first_move) {
+        Ok(validated) => {
+            let tiles_map: Vec<(usize, usize, wabble_words::tile::Tile)> = placed
+                .iter()
+                .map(|pt| (pt.row, pt.col, pt.tile))
+                .collect();
+
+            let mut words = Vec::new();
+            let mut total = 0i32;
+
+            for (positions, word_str) in validated.words_formed.iter().zip(&validated.word_strings) {
+                let word_score =
+                    scoring::score_word(positions, &state.board, &placed, &tiles_map);
+                total += word_score;
+                words.push((word_str.clone(), word_score));
+            }
+
+            total += scoring::bingo_bonus(placed.len());
+
+            *preview = ScorePreview {
+                words,
+                total_score: total,
+                valid: true,
+            };
+        }
+        Err(_) => {
+            *preview = ScorePreview::default();
+        }
+    }
+}
+
+pub fn update_preview_display(
+    preview: Option<Res<ScorePreview>>,
+    mut panel_query: Query<&mut Node, With<ScorePreviewPanel>>,
+    mut text_query: Query<&mut Text, With<ScorePreviewText>>,
+) {
+    let Some(preview) = preview else { return };
+    if !preview.is_changed() {
+        return;
+    }
+
+    for mut node in &mut panel_query {
+        node.display = if preview.valid {
+            Display::Flex
+        } else {
+            Display::None
+        };
+    }
+
+    if preview.valid {
+        let mut lines = Vec::new();
+        for (word, score) in &preview.words {
+            lines.push(format!("{word}  +{score}"));
+        }
+        if preview.words.len() > 1 || scoring::bingo_bonus(0) > 0 {
+            // Always show total when multiple words
+            lines.push(format!("──────\nTotal  +{}", preview.total_score));
+        }
+        for mut text in &mut text_query {
+            **text = lines.join("\n");
+        }
     }
 }
 
